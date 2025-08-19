@@ -1,12 +1,13 @@
 use std::error::Error;
-use std::fmt::{Debug, Display, Formatter, Result as ParseResult};
+use std::fmt::{Display, Formatter, Result as ParseResult};
 use std::str::Utf8Error;
 
-use crate::http::Method;
+use crate::http::{Method, QueryString};
 
+#[derive(Debug)]
 pub struct Request<'a> {
     path: &'a str,
-    query_string: Option<&'a str>,
+    query_string: Option<QueryString<'a>>,
     method: Method,
 }
 
@@ -27,8 +28,8 @@ impl<'a> TryFrom<&'a [u8]> for Request<'a> {
 
         let mut query_string = None;
         if let Some(i) = path.find('?') {
+            query_string = Some(QueryString::from(&path[i + 1..]));
             path = &path[..i];
-            query_string = Some(&path[i + 1..]);
         }
 
         Ok(Request {
@@ -49,6 +50,7 @@ fn get_next_word(request: &str) -> Option<(&str, &str)> {
     None
 }
 
+#[derive(Debug)]
 pub enum ParseError {
     InvalidRequest,
     InvalidEncoding,
@@ -73,11 +75,11 @@ impl Display for ParseError {
     }
 }
 
-impl Debug for ParseError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> ParseResult {
-        write!(f, "{}", self.messsage())
-    }
-}
+// impl Debug for ParseError {
+//     fn fmt(&self, f: &mut Formatter<'_>) -> ParseResult {
+//         write!(f, "{}", self.messsage())
+//     }
+// }
 
 impl From<Utf8Error> for ParseError {
     fn from(_: Utf8Error) -> Self {
