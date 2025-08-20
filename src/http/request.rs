@@ -1,3 +1,22 @@
+/*
+GET /index.html HTTP/1.1\r\n
+Host: www.example.com\r\n
+User-Agent: ExampleBrowser/1.0\r\n
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*\/\*;q=0.8\r\n
+Accept-Language: en-US,en;q=0.5\r\n
+Accept-Encoding: gzip, deflate\r\n
+Connection: close\r\n
+\r\n
+
+Request-Line → GET /index.html HTTP/1.1\r\n
+
+Headers each terminated with \r\n
+
+Blank line (\r\n) signals the end of the headers
+
+Optional body would follow (only for methods like POST or PUT)
+*/
+
 use std::error::Error;
 use std::fmt::{Display, Formatter, Result as ParseResult};
 use std::str::Utf8Error;
@@ -9,6 +28,20 @@ pub struct Request<'a> {
     path: &'a str,
     query_string: Option<QueryString<'a>>,
     method: Method,
+}
+
+impl<'a> Request<'a> {
+    pub fn path(&self) -> &str {
+        &self.path
+    }
+
+    pub fn method(&self) -> &Method {
+        &self.method
+    }
+
+    pub fn query_string(&self) -> Option<&QueryString> {
+        self.query_string.as_ref()
+    }
 }
 
 impl<'a> TryFrom<&'a [u8]> for Request<'a> {

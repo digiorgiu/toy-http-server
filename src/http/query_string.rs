@@ -21,7 +21,6 @@ impl<'a> QueryString<'a> {
 
 impl<'a> From<&'a str> for QueryString<'a> {
     fn from(s: &'a str) -> Self {
-        println!("{}", s);
         let mut data = HashMap::new();
 
         for sub_str in s.split('&') {
